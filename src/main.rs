@@ -13,7 +13,7 @@ use ton::primitives::Sphere;
 use ton::scene::Scene;
 
 fn main() {
-    let red_spec = Material::new(RED, WHITE, 0.1, MaterialType::Refractive);
+    let red_spec = Material::new(RED, WHITE, 0.1, MaterialType::Specular);
     let red_diffuse = Material::new(RED, WHITE, 0.1, MaterialType::Diffuse);
     let blue_diffuse = Material::new(WHITE, WHITE, 0.1, MaterialType::Diffuse);
     let cyan_diffuse = Material::new(Color::new(0.,0.5,0.75), WHITE, 0.1,MaterialType::Diffuse);
