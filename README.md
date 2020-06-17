@@ -1,5 +1,5 @@
 # Ton
-![Uh oh, the example picture didn't load](https://raw.githubusercontent.com/WilliamASumner/ton/example-images/specular-and-diffuse.png)
+![Uh oh, the example picture didn't load](https://github.com/WilliamASumner/ton/raw/master/example-images/specular-and-diffuse.png)
 ## Running it
 Running Ton should be as easy as `git clone`ing the repo and running `cargo run`. Running with the `--release` flag will probably make it run faster. All output is directed to the `output/test.png` file, though this will probably change as I make this more complex.
 
