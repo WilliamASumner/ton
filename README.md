@@ -1,5 +1,8 @@
 # Ton
-![Uh oh, the example picture didn't load](https://github.com/WilliamASumner/ton/raw/master/example-images/specular-and-diffuse.png)
+<p align="center">
+  <img alt="Uh oh, the example picture didn't load" src="https://github.com/WilliamASumner/ton/raw/master/example-images/specular-and-diffuse.png" />
+</p>  
+
 ## Running it
 Running Ton should be as easy as:
 ```
