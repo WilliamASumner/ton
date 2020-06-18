@@ -137,7 +137,7 @@ impl Shadable for Sphere {
             let tt = (b - det.sqrt()) * inv;
             let t = (b + det.sqrt()) * inv;
             let min = t.min(tt);
-            if min >= -0.00000000001 {
+            if min >= -0.00000000001f64 {
                 return Some(Intersection::new(
                     self.normal(&ray.at_t(min)).unwrap(),
                     &self.material,
