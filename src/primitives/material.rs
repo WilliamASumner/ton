@@ -43,7 +43,7 @@ impl Color {
     }
 
     pub fn mult(&self, fact: f64) -> Color {
-        assert!(fact > 0.);
+        assert!(fact >= 0.);
         Color {
             red: self.red * fact,
             green: self.green * fact,
