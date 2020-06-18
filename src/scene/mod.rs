@@ -86,8 +86,7 @@ impl<'a> Scene<'a> {
         let sin_theta = hit.ray.direction.cross(&hit.normal).mag();
         let parallel = hit.ray.direction.sub(&hit.normal.scale(ang));
         let dir = hit.normal.scale(-1.).add(&parallel.scale(ior*sin_theta)).norm();
-        //Ray::new(hit.point(),hit.ray.directi,1.)
-        hit.ray.clone()
+        Ray::new(hit.point(),dir,1.)
     }
 
     pub fn shade(&self, hit: Intersection, depth: u32, max_depth: u32) -> Color {
