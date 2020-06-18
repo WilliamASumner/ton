@@ -60,7 +60,7 @@ impl Camera {
         self
     }
 
-    pub fn generate_ray(&self, pix_x: u32, pix_y: u32) -> Ray {
+    pub fn generate_ray(&self, pix_x: u32, mut pix_y: u32) -> Ray {
         if pix_x >= self.res_x || pix_y >= self.res_y {
             panic!(
                 "Invalid coordinates {}, {} with resolution {} x {}",
@@ -93,6 +93,8 @@ impl Camera {
          *-1 +----------------------------+
          *   -1                           1
          */
+
+        pix_y = self.res_y - pix_y; // invert so y points upward
 
         let ratio = self.res_y as f64 / self.res_x as f64;
         let transform_x = 2. * (pix_x as f64 / self.res_x as f64) - 1.;
