@@ -4,7 +4,6 @@ use crate::math::point3::Point3;
 use crate::math::ray::Ray;
 use crate::math::vec3::Vec3;
 
-
 use material::Color;
 use material::Material;
 use material::MaterialType;
@@ -22,6 +21,23 @@ impl Sphere {
         Sphere {
             origin: o,
             radius: r,
+            material: mat,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Plane {
+    origin: Point3,
+    normal: Vec3,
+    material: Material,
+}
+
+impl Plane {
+    pub fn new(o: Point3, n: Vec3, mat: Material) -> Plane {
+        Plane {
+            origin: o,
+            normal: n,
             material: mat,
         }
     }
@@ -131,6 +147,28 @@ impl Shadable for Sphere {
         }
         None
     }
+}
+
+impl Shadable for Plane {
+    fn normal(&self, _p: &Point3) -> Option<Vec3> {
+        Some(self.normal)
+    }
+
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        let ray_normal = ray.direction.dot(&self.normal);
+
+        if ray_normal.abs() > 0.001f64 {
+            let t = self.origin.sub(&ray.origin).dot(&self.normal) / ray_normal;
+            if t > 0.001f64 {
+                return Some(Intersection::new(self.normal(&ray.at_t(0.)).unwrap(),
+                                              &self.material,
+                                              ray.clone_with_t(t),
+                                              ));
+            }
+        }
+        None
+    }
+
 }
 
 pub trait LightSource: std::fmt::Debug {
