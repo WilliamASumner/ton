@@ -80,13 +80,17 @@ impl<'a> Scene<'a> {
         Ray::new(hit.point(),dir,1.)
     }
 
-    pub fn refract_through(&self, hit: &Intersection) -> Ray {
-        let ang = hit.ray.direction.dot(&hit.normal);
-        let ior = 1.333; // ior of water
-        let sin_theta = hit.ray.direction.cross(&hit.normal).mag();
-        let parallel = hit.ray.direction.sub(&hit.normal.scale(ang));
-        let dir = hit.normal.scale(-1.).add(&parallel.scale(ior*sin_theta)).norm();
-        Ray::new(hit.point(),dir,1.)
+    pub fn refract_through(&self, hit: &Intersection, prev_ior: f64) -> Option<Ray> {
+        let cos = hit.ray.direction.dot(&hit.normal);
+        let ior_frac = prev_ior / 1.333; // ior of water, TODO add to material
+        let sin_theta_t = ior_frac.powi(2) * (1. - cos.powi(2));
+        //if sin_theta_t > 0.9 {
+            //return None;
+        //}
+        let incident_comp = ior_frac;
+        let normal_comp = ior_frac*cos - (1. - sin_theta_t.sqrt());
+        let dir = hit.ray.direction.scale(incident_comp).add(&hit.normal.scale(normal_comp)).norm();
+        Some(Ray::new(hit.point(),dir,1.))
     }
 
     pub fn shade(&self, hit: Intersection, depth: u32, max_depth: u32) -> Color {
@@ -119,8 +123,11 @@ impl<'a> Scene<'a> {
             },
 
             MaterialType::Refractive => {
-                let refr_ray = self.refract_through(&hit);
-                let new_hit = self.find_nearest_intersect(&refr_ray);
+                let refr_ray = self.refract_through(&hit,1.);
+                let new_hit = match refr_ray {
+                    Some(ray) => self.find_nearest_intersect(&ray),
+                    None => None
+                };
                 match new_hit {
                     Some(intersection) => self.shade(intersection,depth+1,max_depth),
                     None => col,
