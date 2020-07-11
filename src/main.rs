@@ -4,27 +4,22 @@
 use ton::math::point3::Point3;
 use ton::math::vec3::Vec3;
 use ton::primitives::camera::Camera;
-use ton::primitives::material::Color;
-use ton::primitives::material::Material;
-use ton::primitives::material::MaterialType;
-use ton::primitives::material::{RED,BLUE,WHITE,BLACK};
-use ton::primitives::PointLight;
-use ton::primitives::Sphere;
-use ton::primitives::Plane;
-
+use ton::primitives::material::{Material,Color};
+use ton::predef::colors;
+use ton::primitives::{PointLight,Sphere,Plane};
 use ton::scene::Scene;
 
 fn main() {
-    let _red_refractive = Material::new(RED, WHITE, 0.1, MaterialType::Refractive);
-    let red_diffuse = Material::new(RED, WHITE, 0.1, MaterialType::Diffuse);
-    let red_specular = Material::new(RED, WHITE, 0.1, MaterialType::Specular);
-    let blue_diffuse = Material::new(BLUE, WHITE, 0.1, MaterialType::Diffuse);
-    let grey_diffuse = Material::new(Color::new(0.25,0.25,0.25), WHITE, 0.1, MaterialType::Diffuse);
+    let _red_refractive = Material::new(colors::RED, colors::WHITE, 0.1, MaterialType::Refractive);
+    let red_diffuse = Material::new(colors::RED, colors::WHITE, 0.1, MaterialType::Diffuse);
+    let red_specular = Material::new(colors::RED, colors::WHITE, 0.1, MaterialType::Specular);
+    let blue_diffuse = Material::new(colors::BLUE, colors::WHITE, 0.1, MaterialType::Diffuse);
+    let grey_diffuse = Material::new(Color::new(0.25,0.25,0.25), colors::WHITE, 0.1, MaterialType::Diffuse);
 
     let mut scene = Scene::new();
     let sphere_one   = Sphere::new(Point3::new(0., 0., -0.5), 0.25, red_diffuse);
     let sphere_two   = Sphere::new(Point3::new(-0.3, 0.0, 0.2), 0.25, blue_diffuse);
-    let sphere_three = Sphere::new(Point3::new(0.6, 0., 0.2), 0.25, red_specular);
+    let sphere_three = Sphere::new(Point3::new(0.2, 0., 0.1), 0.25, red_refractive);
 
     let plane_one = Plane::new(Point3::new(0.,-0.25,0.),Vec3::new(0.,1.,0.),grey_diffuse);
 
@@ -39,14 +34,14 @@ fn main() {
     scene.set_camera(camera);
 
     scene.add_object(sphere_one);
-    scene.add_object(sphere_two);
+    //scene.add_object(sphere_two);
     scene.add_object(sphere_three);
 
     scene.add_object(plane_one);
 
     scene.add_light(light);
 
-    scene.set_background_col(BLACK);
+    scene.set_background_col(colors::BLACK);
 
     scene.render().save("output/test.png").ok();
 }
