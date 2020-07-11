@@ -93,3 +93,13 @@ impl Vec3 {
         Point3::new(self.x, self.y, self.z)
     }
 }
+
+impl Default for Vec3 {
+    fn default() -> Self {
+        Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 0.,
+        }
+    }
+}
