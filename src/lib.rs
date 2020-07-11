@@ -1,3 +1,6 @@
+#[cfg(test)]
+#[macro_use]
+extern crate approx;
 //extern crate rand;
 pub mod math;
 pub mod primitives;
