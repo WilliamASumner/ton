@@ -2,9 +2,9 @@ use image::Rgb;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
-    red: f64,
-    green: f64,
-    blue: f64,
+    pub red: f64,
+    pub green: f64,
+    pub blue: f64,
 }
 
 impl Color {
@@ -14,18 +14,6 @@ impl Color {
             green: g,
             blue: b,
         }
-    }
-
-    pub fn r_val(&self) -> f64 {
-        self.red
-    }
-
-    pub fn g_val(&self) -> f64 {
-        self.green
-    }
-
-    pub fn b_val(&self) -> f64 {
-        self.blue
     }
 
     pub fn add(&mut self, other: &Color) {
@@ -69,66 +57,52 @@ impl Color {
 }
 
 #[derive(Debug,Copy,Clone)]
-pub enum MaterialType {
-    Diffuse,
-    Specular,
-    DiffSpec,
-    Refractive,
-}
-
-#[derive(Debug,Copy,Clone)]
-pub struct Material {
-    pub diff_col: Color,
-    pub spec_col: Color,
-    pub specularity: f64,
-    pub mat_type: MaterialType,
+pub enum Material {
+    Diffuse {
+        diff_col: Color
+    },
+    Specular {
+        spec_col: Color
+    },
+    Mixed { 
+        diff_col: Color,
+        spec_col: Color,
+        spec_factor: f64,
+    },
+    Refractive {
+        spec_col: Color,
+        refr_col: Color,
+        ior: f64,
+    },
 }
 
 impl Material {
-    pub fn new(diffuse: Color, spec: Color, shine: f64,mat: MaterialType) -> Material {
-        Material {
-            diff_col: diffuse,
-            spec_col: spec,
-            specularity: shine,
-            mat_type: mat,
+    pub fn diffuse(col : Color) -> Self {
+        Material::Diffuse {
+            diff_col: col,
         }
     }
-}
 
-// Helpful colors
-#[allow(dead_code)]
-pub const RED: Color = Color {
-    red: 1.,
-    green: 0.,
-    blue: 0.,
-};
-#[allow(dead_code)]
-pub const GREEN: Color = Color {
-    red: 0.,
-    green: 1.,
-    blue: 0.,
-};
-#[allow(dead_code)]
-pub const BLUE: Color = Color {
-    red: 0.,
-    green: 0.,
-    blue: 1.,
-};
-#[allow(dead_code)]
-pub const BLACK: Color = Color {
-    red: 0.,
-    green: 0.,
-    blue: 0.,
-};
-#[allow(dead_code)]
-pub const GREY: Color = Color {
-    red: 0.5,
-    green: 0.5,
-    blue: 0.5,
-};
-#[allow(dead_code)]
-pub const WHITE: Color = Color {
-    red: 1.,
-    green: 1.,
-    blue: 1.,
-};
+    pub fn specular(col: Color) -> Self {
+        Material::Specular {
+            spec_col: col,
+        }
+    }
+
+    pub fn mixed(dcol: Color, scol: Color, fact: f64) -> Self {
+        Material::Mixed {
+            diff_col: dcol,
+            spec_col: scol,
+            spec_factor: fact,
+        }
+    }
+
+    pub fn refractive(scol: Color, rcol: Color, ior: f64) -> Self {
+        Material::Refractive {
+            spec_col: scol,
+            refr_col: rcol,
+            ior: ior,
+        }
+    }
+
+}

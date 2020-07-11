@@ -4,7 +4,7 @@ use image::{ImageBuffer, Rgb};
 use crate::math::ray::Ray;
 use crate::primitives::camera::Camera;
 use crate::primitives::material::Color;
-use crate::primitives::material::MaterialType;
+use crate::primitives::material::Material;
 use crate::primitives::Intersection;
 use crate::primitives::LightSource;
 use crate::primitives::Shadable;
@@ -62,6 +62,10 @@ impl<'a> Scene<'a> {
                 }
             }
         }
+        if let Some(mut intersection) = current_hit {
+            intersection.add_bias();
+            current_hit = Some(intersection);
+        }
         current_hit
     }
 
@@ -74,56 +78,38 @@ impl<'a> Scene<'a> {
         false
     }
 
-    pub fn reflect_off(&self, hit: &Intersection) -> Ray {
-        let ang = hit.ray.direction.dot(&hit.normal);
-        let dir = hit.ray.direction.sub(&hit.normal.scale(2.*(ang)));
-        Ray::new(hit.point(),dir,1.)
-    }
-
-    pub fn refract_through(&self, hit: &Intersection, prev_ior: f64) -> Option<Ray> {
-        let cos = hit.ray.direction.dot(&hit.normal);
-        let ior_frac = prev_ior / 1.333; // ior of water, TODO add to material
-        let sin_theta_t = ior_frac.powi(2) * (1. - cos.powi(2));
-        //if sin_theta_t > 0.9 {
-            //return None;
-        //}
-        let incident_comp = ior_frac;
-        let normal_comp = ior_frac*cos - (1. - sin_theta_t.sqrt());
-        let dir = hit.ray.direction.scale(incident_comp).add(&hit.normal.scale(normal_comp)).norm();
-        Some(Ray::new(hit.point(),dir,1.))
-    }
-
     pub fn shade(&self, hit: Intersection, depth: u32, max_depth: u32) -> Color {
-        let mut col = self.background_col.mix(&hit.material.diff_col, 0.9); // start off as background col + some material color
+        let mut col = self.background_col;
         if depth == max_depth {
+            //println!("Max depth exceeded");
             return col;
         }
         let hit_point = hit.point();
 
         match hit.mat() {
-            MaterialType::Diffuse => {
+            Material::Diffuse { diff_col }  => {
                 for light in self.lights.iter() {
                     let shadow_ray = light.trace_light(&hit_point);
                     if !self.is_occluded(&shadow_ray) {
                         let cos = shadow_ray.direction().dot(&hit.normal).abs();
-                        col.add(&hit.material.diff_col.mult(cos));
+                        col.add(&diff_col.mult(cos));
                         col = col.clamp(); // TODO add tone mapping to remove this
                     }
                 }
                 col
             },
 
-            MaterialType::Specular => {
-                let refl_ray = self.reflect_off(&hit);
+            Material::Specular { spec_col } => {
+                let refl_ray = &hit.reflect();
                 let new_hit = self.find_nearest_intersect(&refl_ray);
                 match new_hit {
-                    Some(intersection) => self.shade(intersection,depth+1,max_depth).mix(&hit.material.diff_col,0.9),
+                    Some(intersection) => self.shade(intersection,depth+1,max_depth).mix(&spec_col,0.9),
                     None => col,
                 }
             },
 
-            MaterialType::Refractive => {
-                let refr_ray = self.refract_through(&hit,1.);
+            Material::Refractive { spec_col, refr_col, ior } => {
+                let refr_ray = &hit.refract();
                 let new_hit = match refr_ray {
                     Some(ray) => self.find_nearest_intersect(&ray),
                     None => None
@@ -134,7 +120,7 @@ impl<'a> Scene<'a> {
                 }
             },
 
-            _ => panic!("MaterialType not implemented!"),
+            _ => panic!("Material Variant not implemented!"),
         }
     }
 
@@ -146,7 +132,7 @@ impl<'a> Scene<'a> {
             let hit = self.find_nearest_intersect(&ray);
 
             *pixel = match hit {
-                Some(intersection) => self.shade(intersection,0,32).to_rgb(),
+                Some(intersection) => self.shade(intersection,0,64).to_rgb(),
                 None => self.background_col.to_rgb(),
             };
         }

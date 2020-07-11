@@ -10,11 +10,11 @@ use ton::primitives::{PointLight,Sphere,Plane};
 use ton::scene::Scene;
 
 fn main() {
-    let _red_refractive = Material::new(colors::RED, colors::WHITE, 0.1, MaterialType::Refractive);
-    let red_diffuse = Material::new(colors::RED, colors::WHITE, 0.1, MaterialType::Diffuse);
-    let red_specular = Material::new(colors::RED, colors::WHITE, 0.1, MaterialType::Specular);
-    let blue_diffuse = Material::new(colors::BLUE, colors::WHITE, 0.1, MaterialType::Diffuse);
-    let grey_diffuse = Material::new(Color::new(0.25,0.25,0.25), colors::WHITE, 0.1, MaterialType::Diffuse);
+    let red_refractive = Material::refractive(colors::WHITE,colors::WHITE,1.5);
+    let red_diffuse = Material::diffuse(colors::RED);
+    let _red_specular = Material::specular(colors::RED);
+    let blue_diffuse = Material::diffuse(colors::BLUE);
+    let grey_diffuse = Material::diffuse(Color::new(0.25,0.25,0.25));
 
     let mut scene = Scene::new();
     let sphere_one   = Sphere::new(Point3::new(0., 0., -0.5), 0.25, red_diffuse);
