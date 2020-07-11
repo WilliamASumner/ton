@@ -100,7 +100,7 @@ impl Camera {
         let transform_x = 2. * (pix_x as f64 / self.res_x as f64) - 1.;
         let transform_y = (2. * (pix_y as f64 / self.res_y as f64) - 1.) * ratio;
         let offset = Vec3::new(transform_x, transform_y, 0.);
-        let p = self.origin.add(&self.view_vec).add(&offset);
+        let p = self.origin.add(&self.view_vec.scale(self.fstop)).add(&offset);
 
         Ray::new(self.origin, p.sub(&self.origin).norm(), 1.0)
     }
@@ -117,7 +117,7 @@ impl Default for Camera {
             view_vec: v,
             up: u,
             right: r,
-            fstop: 1.0,
+            fstop: 0.75,
             film_size: 1.0,
             res_x: 640,
             res_y: 480,
